@@ -2,6 +2,14 @@
 
 Backend API for Intlakaa platform using Node.js, Express, and MongoDB Atlas.
 
+## 🚀 Quick Deploy to Render
+
+📘 **[Quick Deployment Checklist](./DEPLOY_CHECKLIST.md)** - Fast track to production  
+📖 **[Detailed Deployment Guide](./RENDER_DEPLOYMENT_GUIDE.md)** - Complete step-by-step instructions  
+⚡ **[Quick Start Guide](./QUICK_START.md)** - Local development setup
+
+---
+
 ## 🚀 Features
 
 - ✅ RESTful API with Express.js
