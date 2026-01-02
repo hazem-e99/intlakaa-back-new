@@ -2,13 +2,24 @@ import nodemailer from 'nodemailer';
 
 // Create transporter
 const createTransporter = () => {
+  const port = parseInt(process.env.EMAIL_PORT) || 587;
+  const isSecure = port === 465;
+  
   return nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
-    secure: false, // true for 465, false for other ports
+    port: port,
+    secure: isSecure, // true for 465, false for other ports
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASSWORD
+    },
+    // Increase timeout for slow connections
+    connectionTimeout: 30000, // 30 seconds
+    greetingTimeout: 30000,
+    socketTimeout: 30000,
+    // TLS options
+    tls: {
+      rejectUnauthorized: false
     }
   });
 };
