@@ -20,10 +20,13 @@ export const sendInviteEmail = async (email, inviteToken) => {
     
     const inviteUrl = `${process.env.SITE_URL}/admin/accept-invite?token=${inviteToken}`;
 
+    // Use EMAIL_USER as sender since Gmail requires sender to match authenticated user
+    const senderEmail = process.env.EMAIL_USER || process.env.EMAIL_FROM;
+    
     const mailOptions = {
-      from: `"${process.env.SITE_NAME}" <${process.env.EMAIL_FROM}>`,
+      from: `"${process.env.SITE_NAME || 'انطلاقة'}" <${senderEmail}>`,
       to: email,
-      subject: `دعوة للانضمام إلى ${process.env.SITE_NAME}`,
+      subject: `دعوة للانضمام إلى ${process.env.SITE_NAME || 'انطلاقة'}`,
       html: `
         <!DOCTYPE html>
         <html dir="rtl" lang="ar">
@@ -64,9 +67,16 @@ export const sendInviteEmail = async (email, inviteToken) => {
     };
 
     await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully to:', email);
     return { success: true };
   } catch (error) {
-    console.error('Error sending email:', error);
-    throw new Error('فشل إرسال البريد الإلكتروني');
+    console.error('Error sending email:', error.message);
+    console.error('Email config:', {
+      host: process.env.EMAIL_HOST,
+      port: process.env.EMAIL_PORT,
+      user: process.env.EMAIL_USER,
+      from: process.env.EMAIL_FROM
+    });
+    throw new Error(`فشل إرسال البريد الإلكتروني: ${error.message}`);
   }
 };
