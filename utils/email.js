@@ -10,7 +10,7 @@ export const sendInviteEmail = async (email, inviteToken) => {
     const siteName = process.env.SITE_NAME || 'انطلاقة';
 
     const { data, error } = await resend.emails.send({
-      from: `${siteName} <onboarding@resend.dev>`,
+      from: `${siteName} <noreply@intlakaa.com>`,
       to: email,
       subject: `دعوة للانضمام إلى ${siteName}`,
       html: `
