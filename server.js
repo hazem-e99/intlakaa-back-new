@@ -7,6 +7,8 @@ import connectDB from './config/database.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import requestRoutes from './routes/requestRoutes.js';
+import seoRoutes from './routes/seoRoutes.js';
+
 
 // Load environment variables
 dotenv.config();
@@ -73,6 +75,8 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/requests', requestRoutes);
+app.use('/api/seo', seoRoutes);
+
 
 // 404 handler
 app.use((req, res) => {
