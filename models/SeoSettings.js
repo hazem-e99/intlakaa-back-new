@@ -61,7 +61,7 @@ const seoSettingsSchema = new mongoose.Schema({
     // ── Analytics / Tracking ──────────────────────────────────
     gtmId: {
         type: String,
-        default: 'AW-17940276286',
+        default: 'GTM-P2WMX4TV',
         trim: true,
     },
     gaId: {
