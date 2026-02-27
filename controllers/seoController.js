@@ -7,9 +7,12 @@ import SeoSettings from '../models/SeoSettings.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ─── Path to frontend index.html ──────────────────────────────────────────────
-// Works for both local dev (sibling dirs) and production (same server).
-const INDEX_HTML_PATH = path.resolve(__dirname, '../../frontend/index.html');
+// ─── Path to frontend files ──────────────────────────────────────────────────────
+const FRONTEND_DIR = path.resolve(__dirname, '../../frontend');
+const INDEX_HTML_PATH = path.join(FRONTEND_DIR, 'index.html');
+const DIST_DIR = path.join(FRONTEND_DIR, 'dist');
+const DIST_HTML_PATH = path.join(DIST_DIR, 'index.html');
+const PUBLIC_DIR = path.join(FRONTEND_DIR, 'public');
 
 // ─── HTML block helpers ───────────────────────────────────────────────────────
 
@@ -75,6 +78,14 @@ async function updateIndexHtml(settings) {
 
     // ── Open Graph / Twitter ───────────────────────────────────────────────────
     html = replaceBlock(
+        html, 'googleConsole',
+        settings.googleConsole
+            ? `    <meta name="google-site-verification" content="${settings.googleConsole}" />`
+            : `    <!-- No Google Console configured -->`
+    );
+
+    // ── Open Graph / Twitter ───────────────────────────────────────────────────
+    html = replaceBlock(
         html, 'og',
         [
             `    <!-- Open Graph / Social Media Tags -->`,
@@ -82,10 +93,11 @@ async function updateIndexHtml(settings) {
             `    <meta property="og:description" content="${settings.ogDescription}" />`,
             `    <meta property="og:type"        content="website" />`,
             `    <meta property="og:image"       content="${settings.ogImage}" />`,
+            settings.ogUrl ? `    <meta property="og:url"         content="${settings.ogUrl}" />` : '',
             `    <meta name="twitter:card"        content="summary_large_image" />`,
             `    <meta name="twitter:title"       content="${settings.ogTitle}" />`,
             `    <meta name="twitter:description" content="${settings.ogDescription}" />`,
-        ].join('\n')
+        ].filter(Boolean).join('\n')
     );
 
     // ── Analytics / Tracking ───────────────────────────────────────────────────
@@ -94,13 +106,12 @@ async function updateIndexHtml(settings) {
     if (settings.gtmId) {
         chunks.push(
             `    <!-- Google Tag Manager -->`,
-            `    <script async src="https://www.googletagmanager.com/gtag/js?id=${settings.gtmId}"></script>`,
-            `    <script>`,
-            `      window.dataLayer = window.dataLayer || [];`,
-            `      function gtag(){dataLayer.push(arguments);}`,
-            `      gtag('js', new Date());`,
-            `      gtag('config', '${settings.gtmId}');`,
-            `    </script>`
+            `    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':`,
+            `    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],`,
+            `    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=`,
+            `    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);`,
+            `    })(window,document,'script','dataLayer','${settings.gtmId}');</script>`,
+            `    <!-- End Google Tag Manager -->`
         );
     }
 
@@ -145,8 +156,105 @@ async function updateIndexHtml(settings) {
 
     html = replaceBlock(html, 'analytics', chunks.join('\n'));
 
+    // ── GTM noscript in <body> ──────────────────────────────────────────────
+    const gtmBodyContent = settings.gtmId
+        ? [
+            `  <!-- Google Tag Manager (noscript) -->`,
+            `  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=${settings.gtmId}"`,
+            `  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>`,
+            `  <!-- End Google Tag Manager (noscript) -->`,
+        ].join('\n')
+        : `  <!-- No GTM configured -->`;
+
+    html = replaceBlock(html, 'gtm-body', gtmBodyContent);
+
     await writeFile(INDEX_HTML_PATH, html, 'utf-8');
     console.log('[SEO] index.html updated successfully.');
+
+    // Also update dist/index.html if it exists so live builds reflect the change immediately
+    if (existsSync(DIST_HTML_PATH)) {
+        try {
+            let distHtml = await readFile(DIST_HTML_PATH, 'utf-8');
+
+            // Re-apply replacements for dist html
+            distHtml = replaceBlock(distHtml, 'title', `    <title>${settings.siteTitle}</title>`);
+
+            distHtml = replaceBlock(
+                distHtml, 'meta',
+                [
+                    `    <meta name="description" content="${settings.metaDescription}" />`,
+                    `    <meta name="keywords"    content="${settings.keywords}" />`,
+                    `    <meta name="author"      content="انطلاقة" />`,
+                ].join('\n')
+            );
+
+            distHtml = replaceBlock(
+                distHtml, 'og',
+                [
+                    `    <!-- Open Graph / Social Media Tags -->`,
+                    `    <meta property="og:title"       content="${settings.ogTitle}" />`,
+                    `    <meta property="og:description" content="${settings.ogDescription}" />`,
+                    `    <meta property="og:type"        content="website" />`,
+                    `    <meta property="og:image"       content="${settings.ogImage}" />`,
+                    settings.ogUrl ? `    <meta property="og:url"         content="${settings.ogUrl}" />` : '',
+                    `    <meta name="twitter:card"        content="summary_large_image" />`,
+                    `    <meta name="twitter:title"       content="${settings.ogTitle}" />`,
+                    `    <meta name="twitter:description" content="${settings.ogDescription}" />`,
+                ].filter(Boolean).join('\n')
+            );
+
+            distHtml = replaceBlock(
+                distHtml, 'googleConsole',
+                settings.googleConsole
+                    ? `    <meta name="google-site-verification" content="${settings.googleConsole}" />`
+                    : `    <!-- No Google Console configured -->`
+            );
+
+            distHtml = replaceBlock(distHtml, 'analytics', chunks.join('\n'));
+
+            // GTM noscript in body
+            const distGtmBodyContent = settings.gtmId
+                ? [
+                    `  <!-- Google Tag Manager (noscript) -->`,
+                    `  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=${settings.gtmId}"`,
+                    `  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>`,
+                    `  <!-- End Google Tag Manager (noscript) -->`,
+                ].join('\n')
+                : `  <!-- No GTM configured -->`;
+            distHtml = replaceBlock(distHtml, 'gtm-body', distGtmBodyContent);
+
+            await writeFile(DIST_HTML_PATH, distHtml, 'utf-8');
+            console.log('[SEO] dist/index.html updated successfully.');
+        } catch (err) {
+            console.error('[SEO] Failed to update dist/index.html:', err);
+        }
+    }
+
+    // ── robots.txt — write content + append Sitemap: directive if provided ────
+    async function updateFileSafe(filepath, content) {
+        if (!content) return;
+        try {
+            await writeFile(filepath, content, 'utf-8');
+            console.log(`[SEO] Updated ${filepath} successfully.`);
+        } catch (err) {
+            console.error(`[SEO] Failed to update ${filepath}:`, err);
+        }
+    }
+
+    if (settings.robotsTxt) {
+        // Append Sitemap directive if a sitemap URL is configured and not already present
+        let robotsContent = settings.robotsTxt.trim();
+        if (settings.sitemap && !robotsContent.includes('Sitemap:')) {
+            robotsContent += `\nSitemap: ${settings.sitemap}`;
+        }
+        await updateFileSafe(path.join(PUBLIC_DIR, 'robots.txt'), robotsContent);
+        if (existsSync(DIST_DIR)) {
+            await updateFileSafe(path.join(DIST_DIR, 'robots.txt'), robotsContent);
+        }
+    }
+
+    // Note: settings.sitemap is a URL (e.g. https://domain.com/sitemap.xml).
+    // It is included in robots.txt (above) — we do NOT overwrite the sitemap.xml file with it.
 }
 
 // ─── Read index.html → extract current SEO values ────────────────────────────
@@ -173,20 +281,27 @@ async function readSeoFromHtml() {
     const ogTM = ogBlock.match(/property=["']og:title["']\s+content=["']([^"']*)["']/i);
     const ogDM = ogBlock.match(/property=["']og:description["']\s+content=["']([^"']*)["']/i);
     const ogIM = ogBlock.match(/property=["']og:image["']\s+content=["']([^"']*)["']/i);
+    const ogUM = ogBlock.match(/property=["']og:url["']\s+content=["']([^"']*)["']/i);
     const ogTitle = ogTM ? ogTM[1] : '';
     const ogDescription = ogDM ? ogDM[1] : '';
     const ogImage = ogIM ? ogIM[1] : '/logo.png';
+    const ogUrl = ogUM ? ogUM[1] : '';
+
+    // googleConsole
+    const gcBlock = extractBlock(html, 'googleConsole');
+    const gcM = gcBlock.match(/name=["']google-site-verification["']\s+content=["']([^"']*)["']/i);
+    const googleConsole = gcM ? gcM[1] : '';
 
     // analytics
     const analyticsBlock = extractBlock(html, 'analytics');
 
-    // GTM / GA ID from gtag.js?id=
-    const allGtagIds = [...analyticsBlock.matchAll(/gtag\.js\?id=([\w-]+)/gi)].map(m => m[1]);
-    const gtmId = allGtagIds[0] || '';
+    // GTM ID — from proper GTM snippet: gtm.js?id=GTM-XXXXX
+    const gtmM = analyticsBlock.match(/gtm\.js\?id=([\w-]+)/i);
+    const gtmId = gtmM ? gtmM[1] : '';
 
-    // GA4 — second distinct config call
-    const allConfigs = [...analyticsBlock.matchAll(/gtag\(['"]config['"],\s*['"]([^'"]+)['"]\)/gi)].map(m => m[1]);
-    const gaId = allConfigs.find(id => id !== gtmId) || '';
+    // GA4 ID — from gtag.js?id=G-XXXXX
+    const gaM = analyticsBlock.match(/gtag\.js\?id=(G-[\w]+)/i);
+    const gaId = gaM ? gaM[1] : '';
 
     // Facebook pixel
     const fbM = analyticsBlock.match(/fbq\(['"]init['"],\s*['"]([^'"]+)['"]\)/i);
@@ -198,7 +313,7 @@ async function readSeoFromHtml() {
 
     return {
         siteTitle, metaDescription, keywords,
-        ogTitle, ogDescription, ogImage,
+        ogTitle, ogDescription, ogImage, ogUrl, googleConsole,
         gtmId, gaId, fbPixel, tiktokPixel,
     };
 }
@@ -235,7 +350,7 @@ export const updateSeoSettings = async (req, res) => {
     try {
         const ALLOWED = [
             'siteTitle', 'metaDescription', 'keywords',
-            'ogTitle', 'ogDescription', 'ogImage',
+            'ogTitle', 'ogDescription', 'ogImage', 'ogUrl',
             'googleConsole', 'robotsTxt', 'sitemap',
             'gtmId', 'gaId', 'fbPixel', 'tiktokPixel',
         ];

@@ -41,6 +41,11 @@ const seoSettingsSchema = new mongoose.Schema({
         default: '/logo.png',
         trim: true,
     },
+    ogUrl: {
+        type: String,
+        default: 'https://intlakaa.com',
+        trim: true,
+    },
 
     // ── Search / Webmaster ────────────────────────────────────
     googleConsole: {
