@@ -78,6 +78,37 @@ app.use('/api/requests', requestRoutes);
 app.use('/api/seo', seoRoutes);
 
 
+import SeoSettings from './models/SeoSettings.js';
+
+// Serve robots.txt from DB
+app.get('/robots.txt', async (req, res) => {
+  try {
+    const settings = await SeoSettings.findOne({ key: 'main' });
+    let content = settings?.robotsTxt || 'User-agent: *\nAllow: /';
+    if (settings?.sitemap && !content.includes('Sitemap:')) {
+      content += `\nSitemap: ${settings.sitemap}`;
+    }
+    res.type('text/plain').send(content);
+  } catch (error) {
+    res.status(500).send('Error');
+  }
+});
+
+// Serve sitemap.xml from DB if stored as raw XML (Fallback)
+app.get('/sitemap.xml', async (req, res) => {
+  try {
+    const settings = await SeoSettings.findOne({ key: 'main' });
+    if (settings?.sitemap && settings.sitemap.startsWith('<')) {
+      res.type('application/xml').send(settings.sitemap);
+    } else {
+      // If it's a URL, redirect or 404
+      res.status(404).send('Not Found');
+    }
+  } catch (error) {
+    res.status(500).send('Error');
+  }
+});
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({

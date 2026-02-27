@@ -368,7 +368,7 @@ export const updateSeoSettings = async (req, res) => {
             { new: true, upsert: true, runValidators: true }
         );
 
-        await updateIndexHtml(settings);
+        // await updateIndexHtml(settings); // Disabled because Frontend is dynamically injecting SEO from Vercel
 
         res.status(200).json({
             success: true,

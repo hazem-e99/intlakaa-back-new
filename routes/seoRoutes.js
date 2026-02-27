@@ -4,8 +4,8 @@ import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// GET  /api/seo       — fetch current settings (protected)
-router.get('/', protect, getSeoSettings);
+// GET  /api/seo       — fetch current settings (public)
+router.get('/', getSeoSettings);
 
 // PUT  /api/seo       — save settings + rewrite index.html (protected)
 router.put('/', protect, updateSeoSettings);
