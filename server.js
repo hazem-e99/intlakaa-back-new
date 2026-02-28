@@ -87,7 +87,14 @@ app.get('/robots.txt', async (req, res) => {
     const settings = await SeoSettings.findOne({ key: 'main' });
     let content = settings?.robotsTxt || 'User-agent: *\nAllow: /';
     if (settings?.sitemap && !content.includes('Sitemap:')) {
-      content += `\nSitemap: ${settings.sitemap}`;
+      // If sitemap field contains XML content (starts with <)
+      if (settings.sitemap.trim().startsWith('<')) {
+        const siteUrl = process.env.SITE_URL || 'https://intlakaa.com';
+        content += `\nSitemap: ${siteUrl}/sitemap.xml`;
+      } else if (settings.sitemap.startsWith('http')) {
+        // If it's a direct URL
+        content += `\nSitemap: ${settings.sitemap}`;
+      }
     }
     res.type('text/plain').send(content);
   } catch (error) {
@@ -100,23 +107,23 @@ app.get('/sitemap.xml', async (req, res) => {
   try {
     const settings = await SeoSettings.findOne({ key: 'main' });
     if (!settings?.sitemap) {
-        return res.status(404).send('Sitemap not configured');
+      return res.status(404).send('Sitemap not configured');
     }
-    
+
     // If it's a raw XML string
     if (settings.sitemap.trim().startsWith('<')) {
-        return res.type('application/xml').send(settings.sitemap);
+      return res.type('application/xml').send(settings.sitemap);
     }
-    
+
     // If it's a URL (and not the same as requested to avoid infinite loops)
     if (settings.sitemap.startsWith('http')) {
-        // Only redirect if it's NOT the same URL to avoid infinity
-        const currentUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
-        if (settings.sitemap !== currentUrl) {
-            return res.redirect(settings.sitemap);
-        }
+      // Only redirect if it's NOT the same URL to avoid infinity
+      const currentUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+      if (settings.sitemap !== currentUrl) {
+        return res.redirect(settings.sitemap);
+      }
     }
-    
+
     res.status(404).send('Not Found');
   } catch (error) {
     res.status(500).send('Error');
