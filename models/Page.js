@@ -5,7 +5,7 @@ const blockSchema = new mongoose.Schema({
   id: { type: String, required: true },
   type: {
     type: String,
-    enum: ['heading', 'paragraph', 'image', 'video', 'html', 'quote', 'divider', 'cta', 'columns'],
+    enum: ['heading','paragraph','image','video','html','quote','divider','cta','columns','list','stats','cards','testimonials','team','faq','banner','embed','gallery','alert','spacer','table','steps'],
     required: true,
   },
   content: { type: mongoose.Schema.Types.Mixed, default: {} },
