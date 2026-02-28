@@ -8,6 +8,9 @@ import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import requestRoutes from './routes/requestRoutes.js';
 import seoRoutes from './routes/seoRoutes.js';
+import pageRoutes from './routes/pageRoutes.js';
+import postRoutes from './routes/postRoutes.js';
+import SeoSettings from './models/SeoSettings.js';
 
 
 // Load environment variables
@@ -77,9 +80,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/requests', requestRoutes);
 app.use('/api/seo', seoRoutes);
+app.use('/api/pages', pageRoutes);
+app.use('/api/posts', postRoutes);
 
-
-import SeoSettings from './models/SeoSettings.js';
 
 // Serve robots.txt from DB
 app.get('/robots.txt', async (req, res) => {
@@ -87,12 +90,10 @@ app.get('/robots.txt', async (req, res) => {
     const settings = await SeoSettings.findOne({ key: 'main' });
     let content = settings?.robotsTxt || 'User-agent: *\nAllow: /';
     if (settings?.sitemap && !content.includes('Sitemap:')) {
-      // If sitemap field contains XML content (starts with <)
       if (settings.sitemap.trim().startsWith('<')) {
         const siteUrl = process.env.SITE_URL || 'https://intlakaa.com';
         content += `\nSitemap: ${siteUrl}/sitemap.xml`;
       } else if (settings.sitemap.startsWith('http')) {
-        // If it's a direct URL
         content += `\nSitemap: ${settings.sitemap}`;
       }
     }
@@ -109,21 +110,15 @@ app.get('/sitemap.xml', async (req, res) => {
     if (!settings?.sitemap) {
       return res.status(404).send('Sitemap not configured');
     }
-
-    // If it's a raw XML string
     if (settings.sitemap.trim().startsWith('<')) {
       return res.type('application/xml').send(settings.sitemap);
     }
-
-    // If it's a URL (and not the same as requested to avoid infinite loops)
     if (settings.sitemap.startsWith('http')) {
-      // Only redirect if it's NOT the same URL to avoid infinity
       const currentUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
       if (settings.sitemap !== currentUrl) {
         return res.redirect(settings.sitemap);
       }
     }
-
     res.status(404).send('Not Found');
   } catch (error) {
     res.status(500).send('Error');
@@ -142,45 +137,22 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error('Error:', err);
 
-  // Mongoose validation error
   if (err.name === 'ValidationError') {
     const errors = Object.values(err.errors).map(e => e.message);
-    return res.status(400).json({
-      success: false,
-      message: 'خطأ في التحقق من البيانات',
-      errors
-    });
+    return res.status(400).json({ success: false, message: 'خطأ في التحقق من البيانات', errors });
   }
-
-  // Mongoose duplicate key error
   if (err.code === 11000) {
     const field = Object.keys(err.keyPattern)[0];
-    return res.status(400).json({
-      success: false,
-      message: `${field} موجود بالفعل`
-    });
+    return res.status(400).json({ success: false, message: `${field} موجود بالفعل` });
   }
-
-  // JWT errors
   if (err.name === 'JsonWebTokenError') {
-    return res.status(401).json({
-      success: false,
-      message: 'التوكن غير صالح'
-    });
+    return res.status(401).json({ success: false, message: 'التوكن غير صالح' });
   }
-
   if (err.name === 'TokenExpiredError') {
-    return res.status(401).json({
-      success: false,
-      message: 'التوكن منتهي الصلاحية'
-    });
+    return res.status(401).json({ success: false, message: 'التوكن منتهي الصلاحية' });
   }
 
-  // Default error
-  res.status(err.statusCode || 500).json({
-    success: false,
-    message: err.message || 'خطأ في الخادم'
-  });
+  res.status(err.statusCode || 500).json({ success: false, message: err.message || 'خطأ في الخادم' });
 });
 
 // Start server
@@ -198,10 +170,8 @@ app.listen(PORT, () => {
   `);
 });
 
-// Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
   console.error('❌ Unhandled Promise Rejection:', err);
-  // Close server & exit process
   process.exit(1);
 });
 
