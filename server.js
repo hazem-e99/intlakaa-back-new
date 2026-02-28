@@ -23,6 +23,7 @@ connectDB();
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:8080',
+  'http://localhost:8081',
   'https://intlakaa.com',
   'https://www.intlakaa.com',
   process.env.FRONTEND_URL
@@ -94,16 +95,29 @@ app.get('/robots.txt', async (req, res) => {
   }
 });
 
-// Serve sitemap.xml from DB if stored as raw XML (Fallback)
+// Serve sitemap.xml from DB
 app.get('/sitemap.xml', async (req, res) => {
   try {
     const settings = await SeoSettings.findOne({ key: 'main' });
-    if (settings?.sitemap && settings.sitemap.startsWith('<')) {
-      res.type('application/xml').send(settings.sitemap);
-    } else {
-      // If it's a URL, redirect or 404
-      res.status(404).send('Not Found');
+    if (!settings?.sitemap) {
+        return res.status(404).send('Sitemap not configured');
     }
+    
+    // If it's a raw XML string
+    if (settings.sitemap.trim().startsWith('<')) {
+        return res.type('application/xml').send(settings.sitemap);
+    }
+    
+    // If it's a URL (and not the same as requested to avoid infinite loops)
+    if (settings.sitemap.startsWith('http')) {
+        // Only redirect if it's NOT the same URL to avoid infinity
+        const currentUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+        if (settings.sitemap !== currentUrl) {
+            return res.redirect(settings.sitemap);
+        }
+    }
+    
+    res.status(404).send('Not Found');
   } catch (error) {
     res.status(500).send('Error');
   }
