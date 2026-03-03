@@ -15,8 +15,8 @@ const router = express.Router();
 router.get('/slug/:slug', getPageBySlug);
 
 // Admin protected routes
-router.use(protect);
 router.get('/', getPages);
+router.use(protect);
 router.get('/id/:id', getPageById);
 router.post('/', createPage);
 router.put('/:id', updatePage);

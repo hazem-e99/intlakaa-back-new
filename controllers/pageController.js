@@ -6,7 +6,13 @@ export const getPages = async (req, res) => {
     const { type, status } = req.query;
     const filter = {};
     if (type) filter.type = type;
-    if (status) filter.status = status;
+
+    // Enforce status: 'published' for public requests (non-authenticated)
+    if (!req.user) {
+      filter.status = 'published';
+    } else if (status) {
+      filter.status = status;
+    }
 
     const pages = await Page.find(filter)
       .select('-blocks') // don't send blocks in list view
