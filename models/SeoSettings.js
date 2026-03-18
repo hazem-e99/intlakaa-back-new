@@ -98,6 +98,21 @@ const seoSettingsSchema = new mongoose.Schema({
             { icon: 'linkedin', url: 'https://www.linkedin.com/company/intlakaa/',    label: 'LinkedIn' },
         ],
     },
+
+    // ── Contact Info Cards (dynamic array) ────────────────────
+    contactInfo: {
+        type: [{
+            icon:  { type: String, default: 'phone', trim: true },
+            label: { type: String, default: '',      trim: true },
+            text:  { type: String, default: '',      trim: true },
+            href:  { type: String, default: '',      trim: true },
+        }],
+        default: [
+            { icon: 'phone',    label: 'اتصل بنا', text: '+966532759488',    href: 'tel:+966532759488'              },
+            { icon: 'whatsapp', label: 'راسلنا',   text: 'واتساب',           href: 'https://wa.me/966532759488'     },
+            { icon: 'email',    label: 'البريد',   text: 'info@antlaqa.com', href: 'mailto:info@antlaqa.com'        },
+        ],
+    },
 }, {
     timestamps: true,
 });
