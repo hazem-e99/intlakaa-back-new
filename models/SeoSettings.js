@@ -85,36 +85,18 @@ const seoSettingsSchema = new mongoose.Schema({
         trim: true,
     },
 
-    // ── Social Media Links ────────────────────────────────────
-    socialFacebook: {
-        type: String,
-        default: '',
-        trim: true,
-    },
-    socialTiktok: {
-        type: String,
-        default: '',
-        trim: true,
-    },
-    socialLinkedin: {
-        type: String,
-        default: '',
-        trim: true,
-    },
-    socialInstagram: {
-        type: String,
-        default: '',
-        trim: true,
-    },
-    socialWhatsapp: {
-        type: String,
-        default: '',
-        trim: true,
-    },
-    socialX: {
-        type: String,
-        default: '',
-        trim: true,
+    // ── Social Media Links (dynamic array) ────────────────────
+    socialLinks: {
+        type: [{
+            icon:  { type: String, default: 'globe', trim: true },
+            url:   { type: String, default: '',     trim: true },
+            label: { type: String, default: '',     trim: true },
+        }],
+        default: [
+            { icon: 'tiktok',   url: 'https://www.tiktok.com/@qualified.leads.ksa',  label: 'TikTok'   },
+            { icon: 'facebook', url: 'https://www.facebook.com/share/1Vv4xzKZyu',    label: 'Facebook' },
+            { icon: 'linkedin', url: 'https://www.linkedin.com/company/intlakaa/',    label: 'LinkedIn' },
+        ],
     },
 }, {
     timestamps: true,

@@ -357,12 +357,16 @@ export const updateSeoSettings = async (req, res) => {
             'ogTitle', 'ogDescription', 'ogImage', 'ogUrl',
             'googleConsole', 'robotsTxt', 'sitemap',
             'gtmId', 'gaId', 'fbPixel', 'tiktokPixel',
-            'socialFacebook', 'socialTiktok', 'socialLinkedin',
-            'socialInstagram', 'socialWhatsapp', 'socialX',
+            'socialLinks',
         ];
 
         const update = {};
         ALLOWED.forEach(f => { if (req.body[f] !== undefined) update[f] = req.body[f]; });
+
+        // For socialLinks array, use direct $set to replace entire array
+        if (update.socialLinks !== undefined && !Array.isArray(update.socialLinks)) {
+            delete update.socialLinks;
+        }
 
         const settings = await SeoSettings.findOneAndUpdate(
             { key: 'main' },
