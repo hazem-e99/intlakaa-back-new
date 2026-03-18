@@ -84,6 +84,38 @@ const seoSettingsSchema = new mongoose.Schema({
         default: '',
         trim: true,
     },
+
+    // ── Social Media Links ────────────────────────────────────
+    socialFacebook: {
+        type: String,
+        default: '',
+        trim: true,
+    },
+    socialTiktok: {
+        type: String,
+        default: '',
+        trim: true,
+    },
+    socialLinkedin: {
+        type: String,
+        default: '',
+        trim: true,
+    },
+    socialInstagram: {
+        type: String,
+        default: '',
+        trim: true,
+    },
+    socialWhatsapp: {
+        type: String,
+        default: '',
+        trim: true,
+    },
+    socialX: {
+        type: String,
+        default: '',
+        trim: true,
+    },
 }, {
     timestamps: true,
 });

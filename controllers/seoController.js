@@ -357,6 +357,8 @@ export const updateSeoSettings = async (req, res) => {
             'ogTitle', 'ogDescription', 'ogImage', 'ogUrl',
             'googleConsole', 'robotsTxt', 'sitemap',
             'gtmId', 'gaId', 'fbPixel', 'tiktokPixel',
+            'socialFacebook', 'socialTiktok', 'socialLinkedin',
+            'socialInstagram', 'socialWhatsapp', 'socialX',
         ];
 
         const update = {};
