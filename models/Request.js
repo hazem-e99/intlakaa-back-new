@@ -21,6 +21,16 @@ const requestSchema = new mongoose.Schema({
     required: [true, 'المبيعات الشهرية مطلوبة'],
     trim: true
   },
+  field: {
+    type: String,
+    required: [true, 'المجال مطلوب'],
+    trim: true
+  },
+  motivation: {
+    type: String,
+    required: [true, 'الدافع مطلوب'],
+    trim: true
+  },
   ipAddress: {
     type: String,
     default: null

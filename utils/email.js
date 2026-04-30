@@ -1,10 +1,8 @@
 import { Resend } from 'resend';
 
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 // Send invite email
 export const sendInviteEmail = async (email, inviteToken) => {
+  const resend = new Resend(process.env.RESEND_API_KEY);
   try {
     const inviteUrl = `${process.env.SITE_URL}/admin/accept-invite?token=${inviteToken}`;
     const siteName = process.env.SITE_NAME || 'انطلاقة';

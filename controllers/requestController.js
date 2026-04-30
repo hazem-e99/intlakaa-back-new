@@ -81,10 +81,10 @@ export const getRequest = async (req, res) => {
 // @access  Public
 export const createRequest = async (req, res) => {
   try {
-    const { name, phone, storeUrl, monthlySales, ipAddress, country, phoneCountry } = req.body;
+    const { name, phone, storeUrl, monthlySales, field, motivation, ipAddress, country, phoneCountry } = req.body;
 
     // Validate required fields
-    if (!name || !phone || !storeUrl || !monthlySales) {
+    if (!name || !phone || !storeUrl || !monthlySales || !field || !motivation) {
       return res.status(400).json({
         success: false,
         message: 'جميع الحقول مطلوبة'
@@ -96,6 +96,8 @@ export const createRequest = async (req, res) => {
       phone,
       storeUrl,
       monthlySales,
+      field,
+      motivation,
       ipAddress,
       country,
       phoneCountry
