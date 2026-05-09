@@ -10,6 +10,7 @@ import requestRoutes from './routes/requestRoutes.js';
 import seoRoutes from './routes/seoRoutes.js';
 import pageRoutes from './routes/pageRoutes.js';
 import postRoutes from './routes/postRoutes.js';
+import infoPageRoutes from './routes/infoPageRoutes.js';
 import SeoSettings from './models/SeoSettings.js';
 
 
@@ -82,6 +83,7 @@ app.use('/api/requests', requestRoutes);
 app.use('/api/seo', seoRoutes);
 app.use('/api/pages', pageRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api/info-page', infoPageRoutes);
 
 
 // Serve robots.txt from DB
