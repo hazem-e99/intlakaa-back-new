@@ -108,8 +108,8 @@ const seoSettingsSchema = new mongoose.Schema({
             href:  { type: String, default: '',      trim: true },
         }],
         default: [
-            { icon: 'phone',    label: 'اتصل بنا', text: '+966532759488',    href: 'tel:+966532759488'              },
-            { icon: 'whatsapp', label: 'راسلنا',   text: 'واتساب',           href: 'https://wa.me/966532759488'     },
+            { icon: 'phone',    label: 'اتصل بنا', text: '+966568787605',    href: 'tel:+966568787605'              },
+            { icon: 'whatsapp', label: 'راسلنا',   text: 'واتساب',           href: 'https://wa.me/966568787605'     },
             { icon: 'email',    label: 'البريد',   text: 'info@antlaqa.com', href: 'mailto:info@antlaqa.com'        },
         ],
     },

@@ -4,7 +4,7 @@ const DEFAULT_LINKS = [
   {
     id: 'whatsapp',
     title: 'WhatsApp',
-    url: 'https://wa.me/966511414537',
+    url: 'https://wa.me/966568787605',
     image:
       'https://ugc.production.linktr.ee/3590d048-d96a-4606-8338-dac76d1a48d3_533761570-4297957723824509-3194316454661584700-n.jpeg?io=true&size=thumbnail-stack_v1_0',
     order: 0,
@@ -61,7 +61,7 @@ const DEFAULT_LINKS = [
 
 const DEFAULT_SOCIALS = [
   { id: 'tiktok', label: 'TikTok', icon: 'tiktok', url: 'https://tiktok.com/@intlakaa.agency', order: 0 },
-  { id: 'whatsapp', label: 'WhatsApp', icon: 'whatsapp', url: 'https://wa.me/966511414537', order: 1 },
+  { id: 'whatsapp', label: 'WhatsApp', icon: 'whatsapp', url: 'https://wa.me/966568787605', order: 1 },
   { id: 'instagram', label: 'Instagram', icon: 'instagram', url: 'https://instagram.com/intlakaa', order: 2 },
   { id: 'x', label: 'X', icon: 'x', url: 'https://x.com/intlakaagency', order: 3 },
   { id: 'youtube', label: 'YouTube', icon: 'youtube', url: 'https://www.youtube.com/@Intlakaa', order: 4 },
