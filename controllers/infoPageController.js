@@ -57,6 +57,13 @@ const DEFAULT_LINKS = [
       'https://ugc.production.linktr.ee/978c9167-490f-47b5-84a6-80ab22a25ca7_square.jpeg?io=true&size=thumbnail-stack_v1_0',
     order: 7,
   },
+  {
+    id: 'linkedin-link',
+    title: 'LinkedIn',
+    url: 'https://www.linkedin.com/company/intlakaa/',
+    image: '',
+    order: 8,
+  },
 ];
 
 const DEFAULT_SOCIALS = [
@@ -67,6 +74,7 @@ const DEFAULT_SOCIALS = [
   { id: 'youtube', label: 'YouTube', icon: 'youtube', url: 'https://www.youtube.com/@Intlakaa', order: 4 },
   { id: 'facebook', label: 'Facebook', icon: 'facebook', url: 'https://www.facebook.com/profile.php?id=61576778474038', order: 5 },
   { id: 'snapchat', label: 'Snapchat', icon: 'snapchat', url: 'https://www.snapchat.com/add/intlakaagency', order: 6 },
+  { id: 'linkedin', label: 'LinkedIn', icon: 'linkedin', url: 'https://www.linkedin.com/company/intlakaa/', order: 7 },
 ];
 
 const DEFAULT_DOC = {
